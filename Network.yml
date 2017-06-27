@@ -1,0 +1,8 @@
+---
+- hosts: all
+  user: root
+  tasks:
+
+
+- name: Set machine with static IP address
+  nmcli: type=ethernet cname={{ens33}} ifname={{ens33}} ip4={{192.168.44.129/24}} gw4={{192.168.44.1}} state=present
