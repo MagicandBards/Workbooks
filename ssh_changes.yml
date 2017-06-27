@@ -1,0 +1,16 @@
+---
+- hosts: all
+  user: root
+  tasks: 
+   - name: create a backup of sshd_config
+     command: cp /etc/ssh/sshd_config /etc/ssh/sshd_config_original  
+   
+   - name: write the sshd config file
+     template:
+       src: /etc/ansible/sshd_config.j2
+       dest: /etc/ssh/sshd_config
+    
+   - name: restart sshd
+     service:
+       name: sshd
+       state: restarted  
