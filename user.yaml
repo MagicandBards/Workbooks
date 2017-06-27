@@ -1,0 +1,16 @@
+---
+- hosts: all
+  user: root
+
+  vars_prompt:
+  - name: username
+    prompt: What is a Username?
+  - name: password
+    prompt: What is a password?
+
+  tasks:
+  - name: create a new user
+    user: name={{ username }}
+          state=present
+          groups="wheel"
+          password={{ password }}
