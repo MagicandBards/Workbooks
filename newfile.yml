@@ -5,3 +5,11 @@
    - name: command update
      command: touch /etc/ansible newfile.txt  
 
+#-Chief Hill configure static IPs
+#-Nance configure SSH to work with only certificates and not allow root logins
+#-Barnes set DNS
+#-AR set NTP server to tick.gatech.edu
+#-AR create a user ${first_initial}${last_name}
+#-AR add this user to sudoers
+#-Group A2 add an additional syslog file under /var/log/${username}-alerts so that all notice-level syslog is added to this file
+#-Group A2 log a NOTICE level syslog message to localhost each time the Ansible script is run.
