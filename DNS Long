@@ -1,0 +1,50 @@
+yum install bind*
+
+cp name.localhost f.zone
+cp name.looopback r.zone
+
+
+#create f.zone file and r.zone
+these are your forward and reverse zones
+
+systemctl enable named
+systemctl start named
+
+#configure the permission/ownership/SELinux
+firewall-cmd --permanent --add-port=53/tcp
+firewall-cmd --permanent --add-port=53/udp
+firewall-cmd --reload
+chgrp named -R /var/named
+chown -v root:named /etc/named.conf
+restorecon -rv /var/named
+restorecon /etc/named.conf
+
+#test the DNS
+named-checkconf /etc/named.conf
+
+#add DNS to network interface conf
+vi /etc/sysconfig/network-scripts/ifcfg-enp0s3
+
+TYPE="Ethernet"
+BOOTPROTO="none"
+DEFROUTE="yes"
+IPV4_FAILURE_FATAL="no"
+IPV6INIT="yes"
+IPV6_AUTOCONF="yes"
+IPV6_DEFROUTE="yes"
+IPV6_FAILURE_FATAL="no"
+NAME="enp0s3"
+UUID="whatever it is"
+ONBOOT="yes"
+HWADDR="?"
+IPADDR0="??"
+PREFIX0="24"
+GATEWAY0="192.168.1.1"
+DNS="???"
+IPV6_PEERDNS="yes"
+IPV6_PEERROUTES="yes"
+
+vi /etc/resolv.conf
+nameserver "whatever the ip is"
+
+systemctl restart network
