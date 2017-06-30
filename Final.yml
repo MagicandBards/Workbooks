@@ -8,12 +8,12 @@
   - name: password
     prompt: What is a password?
   - name: static
-    prompt: please enter static IP with cider i.e. 10.0.0.36/24:
+    prompt: please enter static IP with cider i.e. 10.0.0.36/24
   - name: gateway
-    prompt: please enter gateway:
+    prompt: please enter gateway
   - name: interface
-    prompt: please enter interface i.e eth18:
-    
+    prompt: please enter interface i.e eth18
+
 
   tasks:
   - name: create a new user
@@ -35,13 +35,12 @@
   - name: Set machine with static IP address
     nmcli:
      conn_name: static
-     ifname: {{ interface }}
+     ifname: "{{ interface }}"
      type: ethernet
-     ip4: {{ static }}
-     gw4: {{ gateway }}
+     ip4: "{{ static }}"
+     gw4: "{{ gateway }}"
      dns4: 8.8.8.8
      state: present
-
 
   - name: Set logger
     shell: grep -q -F 'authpriv.alert' /etc/rsyslog.d/auth-errors.conf || echo "authpriv.alert /var/log/{{ username }}-errors" >/etc/rsyslog.d/auth-errors.conf
@@ -66,6 +65,6 @@
   handlers:
   - name: restart ntp
     service: name=chronyd state=restarted
-    
+
   - name: restart sshd
-    service: name=sshd state=restarted  
+    service: name=sshd state=restarted
