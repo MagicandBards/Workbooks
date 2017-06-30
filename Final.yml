@@ -1,0 +1,71 @@
+---
+- hosts: all
+  user: root
+
+  vars_prompt:
+  - name: username
+    prompt: What is a Username (fist initial lastname i.e. "George Allen" = gallen)?
+  - name: password
+    prompt: What is a password?
+  - name: static
+    prompt: please enter static IP with cider i.e. 10.0.0.36/24:
+  - name: gateway
+    prompt: please enter gateway:
+  - name: interface
+    prompt: please enter interface i.e eth18:
+    
+
+  tasks:
+  - name: create a new user
+    user: name={{ username }}
+          state=present
+          groups="wheel"
+          password={{ password }}
+
+  - name: Install NTP
+    yum: name=chrony state=present
+
+  - name: Make sure NTP is started up
+    service: name=chronyd state=started enabled=yes
+
+  - name: update chrony
+    shell: grep -q -F 'tick.gatech.edu' /etc/chrony.conf || echo "server tick.gatech.edu" >> /etc/chrony.conf
+    notify: restart ntp
+
+  - name: Set machine with static IP address
+    nmcli:
+     conn_name: static
+     ifname: {{ interface }}
+     type: ethernet
+     ip4: {{ static }}
+     gw4: {{ gateway }}
+     dns4: 8.8.8.8
+     state: present
+
+
+  - name: Set logger
+    shell: grep -q -F 'authpriv.alert' /etc/rsyslog.d/auth-errors.conf || echo "authpriv.alert /var/log/{{ username }}-errors" >/etc/rsyslog.d/auth-errors.conf
+
+  - name: restart syslog
+    service:
+     name: rsyslog
+     state: restarted
+
+  - name: log user of anible
+    shell: logger -p authpriv.alert "ansible was used"
+
+  - name: create a backup of sshd_config
+    command: cp /etc/ssh/sshd_config /etc/ssh/sshd_config_original
+
+  - name: write the sshd config file
+    template:
+     src: /etc/ansible/sshd_config.j2
+     dest: /etc/ssh/sshd_config
+    notify: restart sshd
+
+  handlers:
+  - name: restart ntp
+    service: name=chronyd state=restarted
+    
+  - name: restart sshd
+    service: name=sshd state=restarted  
